@@ -9,20 +9,19 @@ get_first_name() {
     echo $message
 }
 
-spĺit_to_array() {
-    echo ${$1// / }
-}
-
 GIT_USERNAME=$(git config user.name)
 FIRST_NAME=$(get_first_name $GIT_USERNAME)
 echo "Current user: " $GIT_USERNAME
 echo "Searching for first name:" $FIRST_NAME
 
 
-USERNAME_CANDIDATES=$(echo $(git log --format='%aN' | sort -u | grep $FIRST_NAME))  #get author names
-# echo $USERNAME_CANDIDATES
+# USERNAME_CANDIDATES=$(echo $(git log --format='%aN' | sort -u | grep $FIRST_NAME))  #get all author names for debugging purposes
+# # echo $USERNAME_CANDIDATES
 
-TOTAL_FILES=$(git ls-files | grep $EXTENSIONS_GREP_FORMAT | wc -l)
+git shortlog -sn --all | grep -i $FIRST_NAME | while read -r line;
+do
+    ((COMMITS_BY_USER+=$(echo $line | awk -F' ' '{print $1}')))
+done
 
 git log --format='%aN' | sort -u | grep -i $FIRST_NAME | while read -r author ;
     do
@@ -34,23 +33,16 @@ git log --format='%aN' | sort -u | grep -i $FIRST_NAME | while read -r author ;
         ((removed+=${tuples[1]}))
         ((loc+=${tuples[2]}))
     fi
-    # printf "%s\t\t\t Added: %s\t Removed:%s\t Lines of code(LOC):%s\n" "$author" $added $removed $loc
-    
 done
-echo -e "Lines added:" $added "\tLines removed:" $removed "\tLOC(added-removed):" $loc "\tCommits:" $TOTAL_FILES
+echo -e "Lines added:" $added "\tLines removed:" $removed "\tLOC(added-removed):" $loc "\tCommits:" $COMMITS_BY_USER
 
-
-git shortlog -sn --all | grep -i $FIRST_NAME | while read -r line;
-do
-    ((COMMITS_BY_USER+=$(echo $line | awk -F' ' '{print $1}')))
-done
-echo "TOTAL COMMITS: " $COMMITS_BY_USER
+TOTAL_FILES=$(git ls-files | grep $EXTENSIONS_GREP_FORMAT | wc -l)
 
 TOP_CONTRIBUTED_FILE_COUNT=0
 CONTRIBUTED_FILE_COUNT=0
 TOTAL_FILE_COUNT=0
 
-files=$(git ls-files| grep $EXTENSIONS_GREP_FORMAT)
+files=$(git ls-files | grep $EXTENSIONS_GREP_FORMAT)
 for file in $files; 
 do
     BLAME_FILE_COUNT=$(git blame $file | grep -i $FIRST_NAME | wc -l)
@@ -63,16 +55,17 @@ do
     if [ $BLAME_FILE_COUNT -gt 0 ];
     then
         ((CONTRIBUTED_FILE_COUNT+=1))
-        # echo $TOTAL_BLAME $BLAME_FILE_COUNT $file 
     fi
     ((TOTAL_FILE_COUNT+=1))
     
 done
 CONTRIBUTED_AVERAGE=$(($TOTAL_BLAME / $CONTRIBUTED_FILE_COUNT))
 
-echo "number of lines currently used" $TOTAL_BLAME 
-echo "Number of files currently contributed" $CONTRIBUTED_FILE_COUNT 
-echo "Total of files" $TOTAL_FILE_COUNT
-echo "AVG lines by file" $CONTRIBUTED_AVERAGE
+echo "Number of lines currently used" $TOTAL_BLAME 
+echo "Number of files currently contributed" $CONTRIBUTED_FILE_COUNT/$TOTAL_FILE_COUNT
+echo "Average lines by file" $CONTRIBUTED_AVERAGE
 
-echo $TOTAL_BLAME
+DATE_LAST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i | head -n 1 | awk -F' ' '{print $1}')
+DATE_FIRST_COMMIT_BY_AUTHOR=$(git log --reverse --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i | head -n 1 | awk -F' ' '{print $1}')
+echo "My commits between:" $DATE_FIRST_COMMIT_BY_AUTHOR":"$DATE_LAST_COMMIT_BY_AUTHOR 
+
