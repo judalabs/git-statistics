@@ -1,7 +1,8 @@
 #!/bin/bash
 
 shopt -s lastpipe
-actual=$(pwd)
+START_PATH=$(pwd)
+echo $START_PATH
 cd $1
 EXTENSIONS_INPUT=${@:2:$#}
 EXTENSIONS_GREP_FORMAT=${EXTENSIONS_INPUT// /\\|}
@@ -72,16 +73,18 @@ DATE_LAST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short -
 DATE_FIRST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i --reverse | head -n 1 | awk -F' ' '{print $1}')
 echo "My commits between:" $DATE_FIRST_COMMIT_BY_AUTHOR":"$DATE_LAST_COMMIT_BY_AUTHOR 
 
+echo $START_PATH
 echo "{
-    \"totalAddedLines\": $added,
-    \"totalRemovedLines\": $removed,
-    \"linesOfCode\": $loc,
+    \"myFirstCommit\": \"$DATE_FIRST_COMMIT_BY_AUTHOR\",
+    \"myLastCommit\": \"$DATE_LAST_COMMIT_BY_AUTHOR\",
+    \"myTotalAddedLines\": $added,
+    \"myTotalRemovedLines\": $removed,
+    \"myLinesOfCode\": $loc,
+    \"myCommitCount\": $COMMITS_BY_USER,
     \"myLegacyLines\": $MY_LEGACY_LINES,
-    \"topContributedOnSameFile\": $TOP_CONTRIBUTED_SAME_FILE,
+    \"myTopContributedOnSameFile\": $TOP_CONTRIBUTED_SAME_FILE,
     \"myFileContributions\": $CONTRIBUTED_FILE_COUNT,
     \"totalFiles\": $TOTAL_FILE_COUNT,
     \"totalLinesCount\": $TOTAL_LINES_COUNT,
-    \"myAverageContributionByFile\": $CONTRIBUTED_AVERAGE,
-    \"firstCommit\": \"$DATE_FIRST_COMMIT_BY_AUTHOR\",
-    \"lastCommit\": \"$DATE_LAST_COMMIT_BY_AUTHOR\"
+    \"myAverageContributionByFile\": $CONTRIBUTED_AVERAGE
 }" > result.txt
