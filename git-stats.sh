@@ -40,36 +40,48 @@ echo -e "Lines added:" $added "\tLines removed:" $removed "\tLOC(added-removed):
 
 TOTAL_FILES=$(git ls-files | grep $EXTENSIONS_GREP_FORMAT | wc -l)
 
-TOP_CONTRIBUTED_FILE_COUNT=0
+TOP_CONTRIBUTED_SAME_FILE=0
 CONTRIBUTED_FILE_COUNT=0
 TOTAL_FILE_COUNT=0
-
 files=$(git ls-files | grep $EXTENSIONS_GREP_FORMAT)
 for file in $files; 
 do
-    BLAME_FILE_COUNT=$(git blame $file | grep -i $FIRST_NAME | wc -l)
-    ((TOTAL_BLAME+=$BLAME_FILE_COUNT));
-    if [ $BLAME_FILE_COUNT -gt $TOP_CONTRIBUTED_FILE_COUNT ];
+    CONTRIBUTED_LINES_ON_FILE=$(git blame $file | grep -i $FIRST_NAME | wc -l)
+    ((MY_LEGACY_LINES+=$CONTRIBUTED_LINES_ON_FILE));
+    if [ $CONTRIBUTED_LINES_ON_FILE -gt $TOP_CONTRIBUTED_SAME_FILE ];
     then
-        TOP_CONTRIBUTED_FILE_COUNT=$BLAME_FILE_COUNT
-        echo New TOP contributed on git blame: $TOP_CONTRIBUTED_FILE_COUNT "lines on" $file
+        TOP_CONTRIBUTED_SAME_FILE=$CONTRIBUTED_LINES_ON_FILE
+        echo New TOP contributed on git blame: $TOP_CONTRIBUTED_SAME_FILE "lines on" $file
     fi
-    if [ $BLAME_FILE_COUNT -gt 0 ];
+    if [ $CONTRIBUTED_LINES_ON_FILE -gt 0 ];
     then
         ((CONTRIBUTED_FILE_COUNT+=1))
     fi
     ((TOTAL_FILE_COUNT+=1))
     
 done
-CONTRIBUTED_AVERAGE=$(($TOTAL_BLAME / $CONTRIBUTED_FILE_COUNT))
+CONTRIBUTED_AVERAGE=$(($MY_LEGACY_LINES / $CONTRIBUTED_FILE_COUNT))
 
 TOTAL_LINES_COUNT=$(git ls-tree --full-tree -r HEAD --name-only | grep $EXTENSIONS_GREP_FORMAT | xargs -I '$' git show master:$ | wc -l)
-echo "Number of lines currently used" $TOTAL_BLAME/$TOTAL_LINES_COUNT
+echo "Number of lines currently used" $MY_LEGACY_LINES/$TOTAL_LINES_COUNT
 echo "Number of files currently contributed" $CONTRIBUTED_FILE_COUNT/$TOTAL_FILE_COUNT
 echo "Average lines by file" $CONTRIBUTED_AVERAGE
 
+
 DATE_LAST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i | head -n 1 | awk -F' ' '{print $1}')
-DATE_FIRST_COMMIT_BY_AUTHOR=$(git log --reverse --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i | head -n 1 | awk -F' ' '{print $1}')
+DATE_FIRST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i --reverse | head -n 1 | awk -F' ' '{print $1}')
 echo "My commits between:" $DATE_FIRST_COMMIT_BY_AUTHOR":"$DATE_LAST_COMMIT_BY_AUTHOR 
 
-cd $pwd
+echo "{
+    \"totalAddedLines\": $added,
+    \"totalRemovedLines\": $removed,
+    \"linesOfCode\": $loc,
+    \"myLegacyLines\": $MY_LEGACY_LINES,
+    \"topContributedOnSameFile\": $TOP_CONTRIBUTED_SAME_FILE,
+    \"myFileContributions\": $CONTRIBUTED_FILE_COUNT,
+    \"totalFiles\": $TOTAL_FILE_COUNT,
+    \"totalLinesCount\": $TOTAL_LINES_COUNT,
+    \"myAverageContributionByFile\": $CONTRIBUTED_AVERAGE,
+    \"firstCommit\": \"$DATE_FIRST_COMMIT_BY_AUTHOR\",
+    \"lastCommit\": \"$DATE_LAST_COMMIT_BY_AUTHOR\"
+}"
