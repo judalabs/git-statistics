@@ -84,4 +84,4 @@ echo "{
     \"myAverageContributionByFile\": $CONTRIBUTED_AVERAGE,
     \"firstCommit\": \"$DATE_FIRST_COMMIT_BY_AUTHOR\",
     \"lastCommit\": \"$DATE_LAST_COMMIT_BY_AUTHOR\"
-}"
+}" > result.txt
