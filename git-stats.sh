@@ -1,7 +1,9 @@
 #!/bin/bash
-shopt -s lastpipe
 
-EXTENSIONS_INPUT=$@
+shopt -s lastpipe
+actual=$(pwd)
+cd $1
+EXTENSIONS_INPUT=${@:2:$#}
 EXTENSIONS_GREP_FORMAT=${EXTENSIONS_INPUT// /\\|}
 
 get_first_name() {
@@ -16,7 +18,7 @@ echo "Searching for first name:" $FIRST_NAME
 
 
 # USERNAME_CANDIDATES=$(echo $(git log --format='%aN' | sort -u | grep $FIRST_NAME))  #get all author names for debugging purposes
-# # echo $USERNAME_CANDIDATES
+# echo $USERNAME_CANDIDATES
 
 git shortlog -sn --all | grep -i $FIRST_NAME | while read -r line;
 do
@@ -61,7 +63,8 @@ do
 done
 CONTRIBUTED_AVERAGE=$(($TOTAL_BLAME / $CONTRIBUTED_FILE_COUNT))
 
-echo "Number of lines currently used" $TOTAL_BLAME 
+TOTAL_LINES_COUNT=$(git ls-tree --full-tree -r HEAD --name-only | grep $EXTENSIONS_GREP_FORMAT | xargs -I '$' git show master:$ | wc -l)
+echo "Number of lines currently used" $TOTAL_BLAME/$TOTAL_LINES_COUNT
 echo "Number of files currently contributed" $CONTRIBUTED_FILE_COUNT/$TOTAL_FILE_COUNT
 echo "Average lines by file" $CONTRIBUTED_AVERAGE
 
@@ -69,3 +72,4 @@ DATE_LAST_COMMIT_BY_AUTHOR=$(git log --pretty=format:"%ad%x09%an" --date=short -
 DATE_FIRST_COMMIT_BY_AUTHOR=$(git log --reverse --pretty=format:"%ad%x09%an" --date=short --grep=$FIRST_NAME -i | head -n 1 | awk -F' ' '{print $1}')
 echo "My commits between:" $DATE_FIRST_COMMIT_BY_AUTHOR":"$DATE_LAST_COMMIT_BY_AUTHOR 
 
+cd $pwd

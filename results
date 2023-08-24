@@ -1,0 +1,27 @@
+Current user:  rodrigo Conceição
+Searching for first name: rodrigo
+found [Iago Rodrigo Bonifácio]
+found [rodrigo]
+found [Rodrigo]
+found [rodrigoConceicao]
+found [rodrigo Conceição]
+found [Rodrigo Conceição]
+found [rodrigojc]
+found [Rodrigo Juda]
+Lines added: 624974     Lines removed: 336697   LOC(added-removed): 288277      Commits: 5621
+New TOP contributed on git blame: 9 lines on src/main/java/com/accountfy/component/color/AccountfyHexColor.java
+New TOP contributed on git blame: 19 lines on src/main/java/com/accountfy/component/exceptions/ConflictException.java
+New TOP contributed on git blame: 62 lines on src/main/java/com/accountfy/component/exceptions/ExceptionHandlerAccountfy.java
+New TOP contributed on git blame: 108 lines on src/main/java/com/accountfy/component/utils/AccountfyPeriod.java
+New TOP contributed on git blame: 153 lines on src/main/java/com/accountfy/component/utils/DateAccountfyUtils.java
+New TOP contributed on git blame: 163 lines on src/main/java/com/accountfy/component/utils/sortableTree/ForestOperations.java
+New TOP contributed on git blame: 256 lines on src/main/java/com/accountfy/components/analisedespesa/AnaliseDespesaService.java
+New TOP contributed on git blame: 370 lines on src/main/java/com/accountfy/components/balancete/BalanceteService.java
+New TOP contributed on git blame: 671 lines on src/main/java/com/accountfy/components/indicador/formula/FormulaService.java
+fatal: no such path 'src/main/resources/db/scripts/DS_2587/2021-02-02_1_' in HEAD
+fatal: no such path 'CREATE_TABLE_CLIENTE_GESTOR.sql' in HEAD
+fatal: no such path '"src/test/unitario/java/com/accountfy/components/razao/matchers/DescricaoOuInforma\303\247\303\243oOpcionalMatcher.java"' in HEAD
+Number of lines currently used 112012
+Number of files currently contributed 2751/6214
+Average lines by file 40
+My commits between: 2017-06-30:2023-08-22
