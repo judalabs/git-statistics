@@ -1,6 +1,10 @@
 ### git-statistics
-under construction
-### How to run?
-./git-stats.sh .java .sql
+Project statistics and contribution by numbers (under construction)
 
-Project statistics and contribution by numbers 
+### How to run?
+./git-stats.sh <path-to-desired-project> <list-of-extensions-separated-by-space>
+
+Example:
+./git-status.sh /home/user/projectx .java .sql
+
+
