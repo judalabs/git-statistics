@@ -2,6 +2,7 @@
 Project statistics and contribution by numbers
 
 ### How to run?
+chmod +x git-stats.sh
 ./git-stats.sh path-to-desired-project list-of-extensions-separated-by-space
 
 Example:
